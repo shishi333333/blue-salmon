@@ -1,102 +1,148 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content=""width=device=width, intial-scale="1.0"/>
-        <title>Blue Salmon CXI-AI</title>
-        <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blue Salmon CXI-AI</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="hero">
+        <h1>Blue Salmon</h1>
+        <p class="subtitle">
+          Pick a vibe and let our builder create a professional website just for
+          you!
+        </p>
+      </header>
 
-    </head>
-    <body>
-        <div>
-            <h1>Blue Salmon</h1>
-            <p>Pick a vibe and let our builder create a professional website just for you!</p>
-        </div>
+      <main class="card">
+        <form id="websiteForm">
+          <div class="form-group">
+            <label for="webTemplate">Website Template</label>
+            <input
+              type="text"
+              id="webTemplate"
+              name="webTemplate"
+              placeholder="Enter Template URL"
+              required
+            />
+          </div>
 
-        <div>
-            <form id="websiteForm">
-                <div>
-                    <label>Website Template</label>
-                    <input type="text" name="webTemplate" placeholder="Enter Template URL" required/>
-                </div>
+          <div class="form-group">
+            <label for="webName">Website Name</label>
+            <input
+              type="text"
+              id="webName"
+              name="webName"
+              placeholder="Your Website Name"
+              required
+            />
+          </div>
 
+          <div class="form-group">
+            <label for="topic">Topic</label>
+            <input
+              type="text"
+              id="topic"
+              name="topic"
+              placeholder="Your Website Topic"
+              required
+            />
+          </div>
 
-                <div>
-                    <label>Website Name</label>
-                    <input type="text" name="webName" placeholder="Your Website Name" required/>
-                </div>
+          <div class="form-group">
+            <label for="colorScheme">Color Scheme</label>
+            <input
+              type="text"
+              id="colorScheme"
+              name="colorScheme"
+              placeholder="Your Website Colour Scheme"
+              required
+            />
+          </div>
 
-                <div>
-                    <label>Topic</label>
-                    <input type="text" name="topic" placeholder="Your Website Topic" required/>
-                </div>
+          <div class="form-group">
+            <label for="promt">Prompt (Optional)</label>
+            <input
+              type="text"
+              id="prompt"
+              name="prompt"
+              placeholder="Your personal prompt"
+            />
+          </div>
 
-                <div>
-                    <label>Color Scheme</label>
-                    <input type="text" name="colorScheme" placeholder="Your Website Colour Scheme" required/>
-                </div>
+          <button type="submit" id="generateBtn">
+            <span class="btn-text">Generate Website</span>
+            <span class="btn-icon">→</span>
+          </button>
 
-                <button type="submit" id="generateBtn">Generate Website</button>
+          <div id="loadingSection" class="loading-section">
+            <div class="spinner"></div>
+            <p>Generating your website...</p>
+          </div>
+        </form>
+      </main>
+    </div>
 
-                <div id="loadingSection" style="display: none; margin-top: 15px;">
-                    <div class="spinner"></div>
-                    <p>Generating your website...</p>
-                </div>
-            </form>
-        </div>
+    <script>
+      document
+        .getElementById('websiteForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
 
-        <script>
-            document.getElementById("websiteForm").addEventListener("submit", function(e) {
+          const button = document.getElementById('generateBtn');
+          const loadingSection = document.getElementById('loadingSection');
 
-                e.preventDefault();
+          // Disable button + show loading
+          button.disabled = true;
+          loadingSection.style.display = 'block';
 
-                const button = document.getElementById("generateBtn");
-                const loadingSection = document.getElementById("loadingSection");
+          const websiteData = {
+            //templateUrl: "https://www.pfizerforall.com",
+            templateUrl: document.querySelector("input[name='webTemplate']")
+              .value,
+            name: document.querySelector("input[name='webName']").value,
+            topic: document.querySelector("input[name='topic']").value,
+            colour: document.querySelector("input[name='colorScheme']").value,
+            prompt: document.querySelector("input[name='prompt']").value,
+          };
 
-                // Disable button + show loading
-                button.disabled = true;
-                loadingSection.style.display = "block";
+          fetch('http://localhost:3001/api/generate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(websiteData),
+          })
+            .then(async (response) => {
+              const data = await response.json();
 
-                const websiteData = {
-                    //templateUrl: "https://www.pfizerforall.com",
-                    templateUrl: document.querySelector("input[name='webTemplate']").value,
-                    name: document.querySelector("input[name='webName']").value,
-                    topic: document.querySelector("input[name='topic']").value,
-                    colour: document.querySelector("input[name='colorScheme']").value
-                };
+              if (!response.ok) {
+                throw new Error(data.error || 'Server error');
+              }
 
-                fetch("http://localhost:3001/api/generate", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(websiteData)
-                })
-                .then(async response => {
-                    const data = await response.json();
+              return data;
+            })
+            .then((data) => {
+              loadingSection.style.display = 'none';
+              button.disabled = false;
 
-                    if (!response.ok) {
-                        throw new Error(data.error || "Server error");
-                    }
+              window.open(data.url, '_blank'); // correct field
+            })
+            .catch((error) => {
+              loadingSection.style.display = 'none';
+              button.disabled = false;
 
-                    return data;
-                })
-                .then(data => {
-                    loadingSection.style.display = "none";
-                    button.disabled = false;
-
-                    window.open(data.url, "_blank"); // correct field
-                })
-                .catch(error => {
-                    loadingSection.style.display = "none";
-                    button.disabled = false;
-
-                    alert("Error: " + error.message);
-                });
+              alert('Error: ' + error.message);
             });
-
-        </script>
-
-
-    </body>
+        });
+    </script>
+  </body>
 </html>
