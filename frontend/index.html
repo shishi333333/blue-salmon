@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content=""width=device=width, intial-scale="1.0"/>
+        <title>Blue Salmon CXI-AI</title>
+        <link rel="stylesheet" href="style.css">
+
+    </head>
+    <body>
+        <div>
+            <h1>Blue Salmon</h1>
+            <p>Pick a vibe and let our builder create a professional website just for you!</p>
+        </div>
+
+        <div>
+            <form id="websiteForm">
+                <div>
+                    <label>Website Template</label>
+                    <input type="text" name="webTemplate" placeholder="Enter Template URL" required/>
+                </div>
+
+
+                <div>
+                    <label>Website Name</label>
+                    <input type="text" name="webName" placeholder="Your Website Name" required/>
+                </div>
+
+                <div>
+                    <label>Topic</label>
+                    <input type="text" name="topic" placeholder="Your Website Topic" required/>
+                </div>
+
+                <div>
+                    <label>Color Scheme</label>
+                    <input type="text" name="colorScheme" placeholder="Your Website Colour Scheme" required/>
+                </div>
+
+                <button type="submit" id="generateBtn">Generate Website</button>
+
+                <div id="loadingSection" style="display: none; margin-top: 15px;">
+                    <div class="spinner"></div>
+                    <p>Generating your website...</p>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            document.getElementById("websiteForm").addEventListener("submit", function(e) {
+
+                e.preventDefault();
+
+                const button = document.getElementById("generateBtn");
+                const loadingSection = document.getElementById("loadingSection");
+
+                // Disable button + show loading
+                button.disabled = true;
+                loadingSection.style.display = "block";
+
+                const websiteData = {
+                    //templateUrl: "https://www.pfizerforall.com",
+                    templateUrl: document.querySelector("input[name='webTemplate']").value,
+                    name: document.querySelector("input[name='webName']").value,
+                    topic: document.querySelector("input[name='topic']").value,
+                    colour: document.querySelector("input[name='colorScheme']").value
+                };
+
+                fetch("http://localhost:3001/api/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(websiteData)
+                })
+                .then(async response => {
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || "Server error");
+                    }
+
+                    return data;
+                })
+                .then(data => {
+                    loadingSection.style.display = "none";
+                    button.disabled = false;
+
+                    window.open(data.url, "_blank"); // correct field
+                })
+                .catch(error => {
+                    loadingSection.style.display = "none";
+                    button.disabled = false;
+
+                    alert("Error: " + error.message);
+                });
+            });
+
+        </script>
+
+
+    </body>
+</html>
