@@ -1,4 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 function Header() {
   const location = useLocation();
@@ -24,7 +26,7 @@ function Header() {
       <div className="header-content">
         {showBackButton ? (
           <Link to="/" className="header-back">
-            ←
+            <FontAwesomeIcon icon={faChevronLeft} />
           </Link>
         ) : (
           <div className="header-spacer"></div>

@@ -4,6 +4,7 @@ import BottomNav from './components/BottomNav';
 import Home from './pages/Home';
 import History from './pages/History';
 import Analysis from './pages/Analysis';
+import Builder from './pages/Builder';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/history" element={<History />} />
           <Route path="/analysis/:id" element={<Analysis />} />
+          <Route path="/builder/:id" element={<Builder />} />
         </Routes>
       </main>
       <BottomNav />
